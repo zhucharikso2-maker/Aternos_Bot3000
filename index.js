@@ -1,30 +1,25 @@
 const mineflayer = require('mineflayer');
 const express = require('express');
 
-// ========== НАСТРОЙКИ ==========
 const CONFIG = {
-    host: process.env.SERVER_HOST || 'твой_сервер.aternos.me',
-    port: 62227,
-    username: process.env.BOT_NAME || 'MyVovan',
-    password: process.env.BOT_PASSWORD || '12345',
+    host: process.env.SERVER_HOST || 'Viper-SMP.aternos.me',
+    port: 25565,
+    username: process.env.BOT_NAME || 'Vovanchik777987',
+    password: process.env.BOT_PASSWORD || '333555777',
     version: '1.21.4'
 };
 
 let registered = false;
 const app = express();
-
-// ========== ВЕБ-СЕРВЕР ДЛЯ RENDER ==========
 const WEB_PORT = process.env.PORT || 10000;
 
 app.get('/', (req, res) => {
-    res.send('✅ AFK Bot is running! Брат, бот работает!');
+    res.send('✅ AFK Bot is running!');
 });
-
 app.listen(WEB_PORT, '0.0.0.0', () => {
-    console.log(`🌐 Веб-сервер запущен на порту ${WEB_PORT}`);
+    console.log(`🌐 Веб-сервер на порту ${WEB_PORT}`);
 });
 
-// ========== МАЙНКРАФТ БОТ ==========
 const bot = mineflayer.createBot({
     host: CONFIG.host,
     port: CONFIG.port,
@@ -43,16 +38,19 @@ bot.on('message', (msg) => {
     
     if (registered) return;
     
+    // Если просит регистрацию
     if (text.includes('register') || text.includes('регистр')) {
-        console.log('📝 Регистрация...');
-        bot.chat(`/register ${CONFIG.password}`);
+        console.log('📝 Регистрируюсь...');
+        // Отправляем пароль дважды через пробел
+        bot.chat(`/register ${CONFIG.password} ${CONFIG.password}`);
         setTimeout(() => {
             bot.chat(`/login ${CONFIG.password}`);
-        }, 500);
+        }, 1000);
         registered = true;
     }
+    // Если просит логин
     else if (text.includes('login') || text.includes('войти')) {
-        console.log('🔑 Вход...');
+        console.log('🔑 Вхожу...');
         bot.chat(`/login ${CONFIG.password}`);
         registered = true;
     }
@@ -65,7 +63,6 @@ bot.on('spawn', () => {
         const yaw = bot.entity.yaw + (Math.random() - 0.5) * 0.5;
         const pitch = bot.entity.pitch + (Math.random() - 0.5) * 0.3;
         bot.look(yaw, pitch);
-        console.log('🔄 Анти-АФК');
     }, 20000);
 });
 
@@ -79,3 +76,4 @@ bot.on('end', (reason) => {
 });
 
 console.log('🚀 Запуск бота...');
+
