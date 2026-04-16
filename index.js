@@ -1,15 +1,30 @@
 const mineflayer = require('mineflayer');
+const express = require('express');
 
+// ========== НАСТРОЙКИ ==========
 const CONFIG = {
-    host: process.env.SERVER_HOST || 'Viper-SMP.aternos.me',
+    host: process.env.SERVER_HOST || 'твой_сервер.aternos.me',
     port: 62227,
-    username: process.env.BOT_NAME || 'Vovanchik1000245',
-    password: process.env.BOT_PASSWORD || '123454321',
+    username: process.env.BOT_NAME || 'MyVovan',
+    password: process.env.BOT_PASSWORD || '12345',
     version: '1.21.4'
 };
 
-let loggedIn = false;
+let registered = false;
+const app = express();
 
+// ========== ВЕБ-СЕРВЕР ДЛЯ RENDER ==========
+const WEB_PORT = process.env.PORT || 10000;
+
+app.get('/', (req, res) => {
+    res.send('✅ AFK Bot is running! Брат, бот работает!');
+});
+
+app.listen(WEB_PORT, '0.0.0.0', () => {
+    console.log(`🌐 Веб-сервер запущен на порту ${WEB_PORT}`);
+});
+
+// ========== МАЙНКРАФТ БОТ ==========
 const bot = mineflayer.createBot({
     host: CONFIG.host,
     port: CONFIG.port,
@@ -18,43 +33,39 @@ const bot = mineflayer.createBot({
     version: CONFIG.version
 });
 
-// КАК ТОЛЬКО ПОДКЛЮЧИЛСЯ - ПЫТАЕМСЯ ВОЙТИ
 bot.on('login', () => {
-    console.log('🔌 Подключен к серверу, жду приветствие...');
+    console.log('🔌 Подключен к серверу');
 });
 
-// Обрабатываем каждое сообщение
 bot.on('message', (msg) => {
     const text = msg.toString().toLowerCase();
     console.log('💬', text);
     
-    if (loggedIn) return;
+    if (registered) return;
     
-    // Если просит зарегистрироваться
     if (text.includes('register') || text.includes('регистр')) {
-        console.log('📝 Регистрируюсь...');
+        console.log('📝 Регистрация...');
         bot.chat(`/register ${CONFIG.password}`);
         setTimeout(() => {
             bot.chat(`/login ${CONFIG.password}`);
         }, 500);
-        loggedIn = true;
+        registered = true;
     }
-    // Если просит войти
     else if (text.includes('login') || text.includes('войти')) {
-        console.log('🔑 Вхожу...');
+        console.log('🔑 Вход...');
         bot.chat(`/login ${CONFIG.password}`);
-        loggedIn = true;
+        registered = true;
     }
 });
 
 bot.on('spawn', () => {
-    console.log('✅ БОТ В ИГРЕ!');
+    console.log('✅ БОТ В ИГРЕ, БРАТ!');
     
-    // Анти-АФК
     setInterval(() => {
         const yaw = bot.entity.yaw + (Math.random() - 0.5) * 0.5;
         const pitch = bot.entity.pitch + (Math.random() - 0.5) * 0.3;
         bot.look(yaw, pitch);
+        console.log('🔄 Анти-АФК');
     }, 20000);
 });
 
@@ -67,4 +78,4 @@ bot.on('end', (reason) => {
     setTimeout(() => process.exit(1), 15000);
 });
 
-console.log('🚀 Запуск...');
+console.log('🚀 Запуск бота...');
