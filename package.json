@@ -1,15 +1,12 @@
 {
   "name": "aternos-afk-bot",
   "version": "1.0.0",
-  "description": "AFK bot for Minecraft Aternos server",
+  "description": "AFK bot for Aternos",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
   },
   "dependencies": {
     "mineflayer": "^4.14.0"
-  },
-  "keywords": ["minecraft", "aternos", "afk", "bot"],
-  "author": "YourName",
-  "license": "MIT"
+  }
 }
