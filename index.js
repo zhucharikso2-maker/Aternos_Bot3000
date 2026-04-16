@@ -1,11 +1,11 @@
 const mineflayer = require('mineflayer');
 
 const CONFIG = {
-    host: process.env.SERVER_HOST || 'твой_сервер.aternos.me',
-    port: 25565,
-    username: process.env.BOT_NAME || 'MyBot',
-    password: process.env.BOT_PASSWORD || '12345',
-    version: '1.20.4'
+    host: process.env.SERVER_HOST || 'Viper-SMP.aternos.me',
+    port: 62227,
+    username: process.env.BOT_NAME || 'Vovanchik1000245',
+    password: process.env.BOT_PASSWORD || '123454321',
+    version: '1.21.4'
 };
 
 let loggedIn = false;
