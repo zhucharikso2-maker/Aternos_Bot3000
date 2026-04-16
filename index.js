@@ -1,106 +1,70 @@
 const mineflayer = require('mineflayer');
 
-// ========== НАСТРОЙКИ - ИЗМЕНИ НА СВОИ, БРАТ! ==========
 const CONFIG = {
-    host: 'Viper-SMP.aternos.me',  // IP твоего Атерноса
-    port: 62227,
-    username: 'Vova777',        // Любой ник
-    password: '11233455',           // Пароль для регистрации
-    version: '1.21.4'                  // Версия Minecraft
+    host: process.env.SERVER_HOST || 'твой_сервер.aternos.me',
+    port: 25565,
+    username: process.env.BOT_NAME || 'MyBot',
+    password: process.env.BOT_PASSWORD || '12345',
+    version: '1.20.4'
 };
-// =====================================================
 
-let registered = false;
-let reconnectTimeout = null;
+let loggedIn = false;
 
-// Случайная задержка (для имитации человека)
-function randomDelay(min, max) {
-    return Math.floor(Math.random() * (max - min + 1) + min);
-}
-
-// Создаём бота
 const bot = mineflayer.createBot({
     host: CONFIG.host,
     port: CONFIG.port,
     username: CONFIG.username,
     auth: 'offline',
-    version: CONFIG.version,
-    viewDistance: 'far'
+    version: CONFIG.version
 });
 
-// Обработка сообщений (регистрация)
+// КАК ТОЛЬКО ПОДКЛЮЧИЛСЯ - ПЫТАЕМСЯ ВОЙТИ
+bot.on('login', () => {
+    console.log('🔌 Подключен к серверу, жду приветствие...');
+});
+
+// Обрабатываем каждое сообщение
 bot.on('message', (msg) => {
     const text = msg.toString().toLowerCase();
-    console.log(`[ЧАТ] ${text}`);
+    console.log('💬', text);
     
-    if (!registered) {
-        // Регистрация
-        if (text.includes('register') || text.includes('регистр') || text.includes('придумай пароль')) {
-            console.log('🔐 Прохожу регистрацию...');
-            setTimeout(() => {
-                bot.chat(`/register ${CONFIG.password}`);
-            }, randomDelay(500, 1500));
-            setTimeout(() => {
-                bot.chat(`/login ${CONFIG.password}`);
-            }, randomDelay(2000, 3500));
-            registered = true;
-        }
-        // Логин
-        else if (text.includes('login') || text.includes('войти') || text.includes('введите пароль')) {
-            console.log('🔑 Вхожу на сервер...');
-            setTimeout(() => {
-                bot.chat(`/login ${CONFIG.password}`);
-            }, randomDelay(500, 1500));
-            registered = true;
-        }
+    if (loggedIn) return;
+    
+    // Если просит зарегистрироваться
+    if (text.includes('register') || text.includes('регистр')) {
+        console.log('📝 Регистрируюсь...');
+        bot.chat(`/register ${CONFIG.password}`);
+        setTimeout(() => {
+            bot.chat(`/login ${CONFIG.password}`);
+        }, 500);
+        loggedIn = true;
+    }
+    // Если просит войти
+    else if (text.includes('login') || text.includes('войти')) {
+        console.log('🔑 Вхожу...');
+        bot.chat(`/login ${CONFIG.password}`);
+        loggedIn = true;
     }
 });
 
-// Когда бот появился в мире
-bot.once('spawn', () => {
-    console.log(`✅ Бот ${CONFIG.username} зашёл на сервер!`);
-    console.log(`📍 Координаты: X=${bot.entity.position.x.toFixed(1)}, Y=${bot.entity.position.y.toFixed(1)}, Z=${bot.entity.position.z.toFixed(1)}`);
+bot.on('spawn', () => {
+    console.log('✅ БОТ В ИГРЕ!');
     
-    // Анти-АФК: случайные движения и повороты
+    // Анти-АФК
     setInterval(() => {
-        const action = Math.random();
-        
-        if (action < 0.6) {
-            // Поворот головы
-            const yaw = bot.entity.yaw + (Math.random() - 0.5) * 0.6;
-            const pitch = bot.entity.pitch + (Math.random() - 0.5) * 0.3;
-            bot.look(yaw, pitch);
-            console.log('👀 Поворот головы');
-        }
-        else if (action < 0.8) {
-            // Короткий шаг вперёд-назад
-            bot.setControlState('forward', true);
-            setTimeout(() => bot.setControlState('forward', false), randomDelay(200, 800));
-            console.log('🚶 Маленький шаг');
-        }
-        else {
-            // Просто ничего не делаем (имитация AFK)
-            console.log('💤 Бездействую...');
-        }
-    }, randomDelay(15000, 45000));
+        const yaw = bot.entity.yaw + (Math.random() - 0.5) * 0.5;
+        const pitch = bot.entity.pitch + (Math.random() - 0.5) * 0.3;
+        bot.look(yaw, pitch);
+    }, 20000);
 });
 
-// Обработка ошибок
 bot.on('error', (err) => {
-    console.log(`❌ Ошибка: ${err.message}`);
+    console.log('❌ Ошибка:', err.message);
 });
 
-// Переподключение при отключении
 bot.on('end', (reason) => {
-    console.log(`🔌 Отключён: ${reason || 'неизвестная причина'}`);
-    console.log('🔄 Переподключение через 30 секунд...');
-    
-    if (reconnectTimeout) clearTimeout(reconnectTimeout);
-    reconnectTimeout = setTimeout(() => {
-        console.log('🚀 Перезапуск бота...');
-        process.exit(1);
-    }, 30000);
+    console.log('🔌 Отключен:', reason);
+    setTimeout(() => process.exit(1), 15000);
 });
 
-console.log(`🚀 Бот запущен! Сервер: ${CONFIG.host}:${CONFIG.port}`);
-console.log(`👤 Ник: ${CONFIG.username}`);
+console.log('🚀 Запуск...');
