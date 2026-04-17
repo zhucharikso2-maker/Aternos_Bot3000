@@ -6,7 +6,7 @@ const CONFIG = {
     port: 62227,
     username: process.env.BOT_NAME || 'Vovanchik777987',
     password: process.env.BOT_PASSWORD || '333555777',
-    version: '1.20.4'
+    version: '1.21.4'
 };
 
 let registered = false;
