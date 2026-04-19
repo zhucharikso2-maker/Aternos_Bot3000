@@ -13,7 +13,7 @@ jobs:
       - name: Send HTTP request to keep service alive
         run: |
           # ВНИМАНИЕ: Замените URL на адрес вашего сайта на Render!
-          RENDER_SERVICE_URL="https://ваш_сайт.onrender.com"
+          RENDER_SERVICE_URL="https://aternos-bot3000.onrender.com"
           echo "Пингую ${RENDER_SERVICE_URL}..."
           curl -s -o /dev/null "${RENDER_SERVICE_URL}"
           echo "Пинг успешно отправлен в $(date)"
