@@ -1,0 +1,19 @@
+name: Keep Render Alive
+
+on:
+  schedule:
+    # Запускаем задание по расписанию (каждые 14 минут)
+    - cron: '*/14 * * * *'
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send HTTP request to keep service alive
+        run: |
+          # ВНИМАНИЕ: Замените URL на адрес вашего сайта на Render!
+          RENDER_SERVICE_URL="https://ваш_сайт.onrender.com"
+          echo "Пингую ${RENDER_SERVICE_URL}..."
+          curl -s -o /dev/null "${RENDER_SERVICE_URL}"
+          echo "Пинг успешно отправлен в $(date)"
